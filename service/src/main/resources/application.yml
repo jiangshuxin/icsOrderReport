@@ -1,6 +1,6 @@
 server:
   port: 8080
- 
+  
 spring:
   datasource:
     url: jdbc:oracle:thin:@10.48.171.20:1521:icsdb05
