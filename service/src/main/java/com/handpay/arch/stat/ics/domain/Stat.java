@@ -9,7 +9,7 @@ public class Stat {
 	private int undoneCount;
 	private StatType statType;
 	
-	protected Stat(int ordinal) {
+	public Stat(int ordinal) {
 		this.statType = StatType.values()[ordinal];
 	}
 	
