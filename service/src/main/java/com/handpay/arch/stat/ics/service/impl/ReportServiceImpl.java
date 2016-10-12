@@ -12,6 +12,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 
@@ -30,6 +32,7 @@ import java.util.Set;
  * Created by sxjiang on 2016/10/12.
  */
 public class ReportServiceImpl implements ReportService {
+    private static Logger log = LoggerFactory.getLogger(ReportServiceImpl.class);
 
     @Autowired
     private StringRedisTemplateX stringRedisTemplateX;
@@ -88,7 +91,7 @@ public class ReportServiceImpl implements ReportService {
                 String orderCount = stringRedisTemplateX.boundValueOps(StringUtils.join(new String[]{type.name(),date,"orderCount"},"-")).get();
                 report.setOrderCount(Integer.parseInt(orderCount));
 
-                List<String> undoneCountList = stringRedisTemplateX.boundListOps(StringUtils.join(new String[]{type.name(),stat.getOrderDate(),"undoneCount"},"-")).range(0,-1);
+                List<String> undoneCountList = stringRedisTemplateX.boundListOps(StringUtils.join(new String[]{type.name(),date,"undoneCount"},"-")).range(0,-1);
                 report.setUndoneCountList(undoneCountList);
 
                 List<String> undoneRatioList = Lists.newArrayList();
