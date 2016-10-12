@@ -1,18 +1,20 @@
 package com.handpay.arch.stat.ics.service.impl;
 
+import com.google.common.collect.Maps;
 import com.handpay.arch.stat.ics.domain.MetaData;
 import com.handpay.arch.stat.ics.domain.Stat;
+import com.handpay.arch.stat.ics.domain.StatReport;
 import com.handpay.arch.stat.ics.service.ReportService;
 import com.handpay.rache.core.spring.StringRedisTemplateX;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.ParseException;
-import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by sxjiang on 2016/10/12.
@@ -49,8 +51,25 @@ public class ReportServiceImpl implements ReportService {
         return 0;
     }
 
+    private Double extractDateValue(String date){
+        Date day = null;
+        try {
+            day = DateUtils.parseDate(date,datePattern);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return Double.parseDouble(String.valueOf(day.getTime()));
+    }
+
     @Override
-    public String exportExcel(MetaData.StatType type, Date fromDate, Date toDate) {
+    public String exportExcel(String fromDate,String toDate) {
+        Double fromValue = extractDateValue(fromDate);
+        Double toValue = extractDateValue(toDate);
+
+        Map<String,List<StatReport>> dataMap = Maps.newHashMap();
+        for(MetaData.StatType type : MetaData.StatType.values()){
+            Set<String> dateSet = stringRedisTemplateX.boundZSetOps(type.name()).rangeByScore(fromValue,toValue);
+        }
         return null;
     }
 }
