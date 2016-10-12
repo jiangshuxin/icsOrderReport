@@ -12,6 +12,10 @@ public class Stat {
 	public Stat(int ordinal) {
 		this.statType = StatType.values()[ordinal];
 	}
+	public Stat(int ordinal, String orderDate) {	
+		this.statType = StatType.values()[ordinal];
+		this.orderDate = orderDate;
+	}
 	
 	public String getId() {
 		return statType.toString() + "-" + orderDate;
@@ -42,5 +46,33 @@ public class Stat {
 	}
 	public void setUndoneCount(int undoneCount) {
 		this.undoneCount = undoneCount;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((orderDate == null) ? 0 : orderDate.hashCode());
+		result = prime * result + ((statType == null) ? 0 : statType.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Stat other = (Stat) obj;
+		if (orderDate == null) {
+			if (other.orderDate != null)
+				return false;
+		} else if (!orderDate.equals(other.orderDate))
+			return false;
+		if (statType != other.statType)
+			return false;
+		return true;
 	}
 }

@@ -5,5 +5,5 @@ import java.util.List;
 import com.handpay.arch.stat.ics.domain.SimpleOrderStat;
 
 public interface StatRepository {
-	List<SimpleOrderStat> queryStat(String dateStr, int type); 
+	List<SimpleOrderStat> queryStat(int type); 
 }

@@ -23,7 +23,7 @@ public class StatRepositoryImpl implements StatRepository {
 	private JdbcTemplate jdbcTemplate;
 	
 	@Override
-	public List<SimpleOrderStat> queryStat(String dateStr, int id) {
+	public List<SimpleOrderStat> queryStat(int id) {
 		String sql = getSql(id);
 		List<SimpleOrderStat> statList = jdbcTemplate.query(sql, rowMapper);
 		System.out.println("sql::: " + sql);
