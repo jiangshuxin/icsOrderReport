@@ -1,6 +1,5 @@
 package com.handpay.arch.stat.ics.domain;
 
-import java.math.String;
 import java.util.List;
 
 /**
