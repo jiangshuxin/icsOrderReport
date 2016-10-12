@@ -2,8 +2,8 @@ package com.handpay.arch.stat.ics.repositories;
 
 import java.util.List;
 
-import com.handpay.arch.stat.ics.domain.Stat;
+import com.handpay.arch.stat.ics.domain.SimpleOrderStat;
 
 public interface StatRepository {
-	List<Stat> queryStat(String dateStr, int type); 
+	List<SimpleOrderStat> queryStat(String dateStr, int type); 
 }
