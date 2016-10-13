@@ -3,7 +3,7 @@ server:
   
 spring:
   datasource:
-    url: jdbc:oracle:thin:@10.48.171.20:1521:icsdb05
+    url: jdbc:oracle:thin:@10.48.171.20:1521:icsdb08
     username: ics
     password: ics2018!
     driver-class-name: oracle.jdbc.OracleDriver
