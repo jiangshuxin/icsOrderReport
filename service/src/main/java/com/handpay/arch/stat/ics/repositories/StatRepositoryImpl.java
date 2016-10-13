@@ -13,6 +13,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ReflectionUtils;
 
+import com.handpay.arch.stat.ics.domain.MetaData;
 import com.handpay.arch.stat.ics.domain.MetaData.MixType;
 import com.handpay.arch.stat.ics.domain.SimpleOrderStat;
 
@@ -39,13 +40,20 @@ public class StatRepositoryImpl implements StatRepository {
 	public List<SimpleOrderStat> queryStat(int id, String dateStr) {
 		reload();
 		String sql = getSql(id);
+		if (isMall(id)) {  //积分商城:参数为区间
+			return jdbcTemplate.query(sql, new Object[]{dateStr, dateStr.split("-")[0], dateStr.split("-")[1]}, rowMapper);
+		}
 		List<SimpleOrderStat> statList = jdbcTemplate.query(sql, rowMapper);
 		log.info("dateStr:: " + dateStr + ",id:: "+id+",sql:: " + sql);
 		log.info("statList::: " + statList);
 		return statList;
 	}
 	
-	public String getSql(int id) {
+	private boolean isMall(int id) {
+		return (MetaData.MixType.MallSum.getId() == id) || (MetaData.MixType.MallUndone.getId()  == id);
+	}
+	
+	private String getSql(int id) {
 		for (MixType type : MixType.values()) {
 			if (id == type.getId()) {
 				Method method = ReflectionUtils.findMethod(SqlGenerator.class, "get" + type);
