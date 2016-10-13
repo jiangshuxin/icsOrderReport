@@ -8,6 +8,8 @@ import java.util.List;
 public class StatReport extends Stat {
     private List<String> undoneCountList;
     private List<String> undoneRatioList;
+    //积分商城专用
+    private String undoneRatio;
 
     public StatReport(int ordinal) {
         super(ordinal);
@@ -27,5 +29,13 @@ public class StatReport extends Stat {
 
     public void setUndoneRatioList(List<String> undoneRatioList) {
         this.undoneRatioList = undoneRatioList;
+    }
+
+    public String getUndoneRatio() {
+        return undoneRatio;
+    }
+
+    public void setUndoneRatio(String undoneRatio) {
+        this.undoneRatio = undoneRatio;
     }
 }

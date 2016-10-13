@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.io.IOUtils;
@@ -20,6 +22,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -85,21 +88,32 @@ public class ReportServiceImpl implements ReportService {
     public int makeSnapshot(Stat... stats) {//同一个查询时间
         for(Stat stat : stats){
             MetaData.StatType type = stat.getStatType();
-            Date orderDay = null;
-            Date queryDay = null;
-            try {
-                orderDay = DateUtils.parseDate(stat.getOrderDate(),datePattern);
-                queryDay = DateUtils.parseDate(stat.getQueryDate(),datePattern);
-            } catch (ParseException e) {
-                e.printStackTrace();
+            if(type.equals(StatType.Mall)){
+                Date orderDay = null;
+                try {
+                    String[] period = stat.getOrderDate().split("-");
+                    if(period.length < 1)continue;
+                    orderDay = DateUtils.parseDate(period[0],datePattern);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                double value = Double.parseDouble(String.valueOf(orderDay.getTime()));
+                stringRedisTemplateX.boundZSetOps(type.name()).add(JSON.toJSONString(stat, SerializerFeature.WriteClassName),value);
+            }else{
+                Date orderDay = null;
+                try {
+                    orderDay = DateUtils.parseDate(stat.getOrderDate(),datePattern);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                double value = Double.parseDouble(String.valueOf(orderDay.getTime()));
+                stringRedisTemplateX.boundZSetOps(type.name()).add(stat.getOrderDate(),value);
+
+                stringRedisTemplateX.boundValueOps(StringUtils.join(new String[]{type.name(),stat.getOrderDate(),"orderCount"},"-")).set(String.valueOf(stat.getOrderCount()));
+
+                //Long length = stringRedisTemplateX.boundListOps(StringUtils.join(new String[]{type.name(),stat.getOrderDate(),"undoneCount"},"-")).size();
+                stringRedisTemplateX.boundHashOps(StringUtils.join(new String[]{type.name(),stat.getOrderDate(),"undoneCount"},"-")).put(stat.getQueryDate(),String.valueOf(stat.getUndoneCount()));
             }
-            double value = Double.parseDouble(String.valueOf(orderDay.getTime()));
-            stringRedisTemplateX.boundZSetOps(type.name()).add(stat.getOrderDate(),value);
-
-            stringRedisTemplateX.boundValueOps(StringUtils.join(new String[]{type.name(),stat.getOrderDate(),"orderCount"},"-")).set(String.valueOf(stat.getOrderCount()));
-
-            //Long length = stringRedisTemplateX.boundListOps(StringUtils.join(new String[]{type.name(),stat.getOrderDate(),"undoneCount"},"-")).size();
-            stringRedisTemplateX.boundHashOps(StringUtils.join(new String[]{type.name(),stat.getOrderDate(),"undoneCount"},"-")).put(stat.getQueryDate(),String.valueOf(stat.getUndoneCount()));
         }
 
         return 0;
@@ -122,53 +136,64 @@ public class ReportServiceImpl implements ReportService {
 
         Map<String,List<StatReport>> dataMap = Maps.newHashMap();
         for(MetaData.StatType type : MetaData.StatType.values()){
-            Set<String> dateSet = stringRedisTemplateX.boundZSetOps(type.name()).rangeByScore(fromValue,toValue);
             List<StatReport> reportList = Lists.newArrayList();
-            for(String date : dateSet){
-                StatReport report = new StatReport(type.ordinal());
-                report.setOrderDate(date);
-
-                String orderCount = stringRedisTemplateX.boundValueOps(StringUtils.join(new String[]{type.name(),date,"orderCount"},"-")).get();
-                report.setOrderCount(Integer.parseInt(orderCount));
-
-                List<Object> undoneCountList = stringRedisTemplateX.boundHashOps(StringUtils.join(new String[]{type.name(),date,"undoneCount"},"-")).values();
-                report.setUndoneCountList(ListUtils.transformedList(undoneCountList, new Transformer() {
-                    @Override
-                    public String transform(Object input) {
-                        return input.toString();
-                    }
-                }));
-
-                //特殊处理:Offline需展示到T+3  Online T+6 Sunshine T+10
-                int undoneSize = report.getUndoneCountList().size();
-                if(type.equals(StatType.OfflineBatch) && undoneSize < 4){
-                    for(int i=0;i<4-undoneSize;i++){
-                        report.getUndoneCountList().add("#N/A");
-                    }
+            if(type.equals(StatType.Mall)){
+                Set<String> objSet = stringRedisTemplateX.boundZSetOps(type.name()).reverseRangeByScore(fromValue,toValue);
+                for(String objStr : objSet){
+                    Stat stat = JSON.parseObject(objStr,Stat.class);
+                    StatReport report = new StatReport(type.ordinal());
+                    BeanUtils.copyProperties(stat,report);
+                    report.setUndoneRatio(new BigDecimal(stat.getUndoneCount()).divide(new BigDecimal(stat.getOrderCount()),2,RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).toPlainString()+"%");
+                    reportList.add(report);
                 }
-                if(type.equals(StatType.OnlineBatch) && undoneSize < 7){
-                    for(int i=0;i<7-undoneSize;i++){
-                        report.getUndoneCountList().add("#N/A");
-                    }
-                }
-                if(type.equals(StatType.SunshineOnline) && undoneSize < 11){
-                    for(int i=0;i<11-undoneSize;i++){
-                        report.getUndoneCountList().add("#N/A");
-                    }
-                }
+            }else{
+                Set<String> dateSet = stringRedisTemplateX.boundZSetOps(type.name()).reverseRangeByScore(fromValue,toValue);
+                for(String date : dateSet){
+                    StatReport report = new StatReport(type.ordinal());
+                    report.setOrderDate(date);
 
-                List<String> undoneRatioList = Lists.newArrayList();
-                for(String count : report.getUndoneCountList()){
-                    if(StringUtils.equals(count,"#N/A")){
-                        undoneRatioList.add("#N/A");
-                    }else{
-                        BigDecimal ratio = new BigDecimal(count).divide(new BigDecimal(orderCount),2, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100));
-                        undoneRatioList.add(ratio.toPlainString()+"%");
-                    }
-                }
-                report.setUndoneRatioList(undoneRatioList);
+                    String orderCount = stringRedisTemplateX.boundValueOps(StringUtils.join(new String[]{type.name(),date,"orderCount"},"-")).get();
+                    report.setOrderCount(Integer.parseInt(orderCount));
 
-                reportList.add(report);
+                    List<Object> undoneCountList = stringRedisTemplateX.boundHashOps(StringUtils.join(new String[]{type.name(),date,"undoneCount"},"-")).values();
+                    report.setUndoneCountList(ListUtils.transformedList(undoneCountList, new Transformer() {
+                        @Override
+                        public String transform(Object input) {
+                            return input.toString();
+                        }
+                    }));
+
+                    //特殊处理:Offline需展示到T+3  Online T+6 Sunshine T+10
+                    int undoneSize = report.getUndoneCountList().size();
+                    if(type.equals(StatType.OfflineBatch) && undoneSize < 4){
+                        for(int i=0;i<4-undoneSize;i++){
+                            report.getUndoneCountList().add("#N/A");
+                        }
+                    }
+                    if(type.equals(StatType.OnlineBatch) && undoneSize < 7){
+                        for(int i=0;i<7-undoneSize;i++){
+                            report.getUndoneCountList().add("#N/A");
+                        }
+                    }
+                    if(type.equals(StatType.SunshineOnline) && undoneSize < 11){
+                        for(int i=0;i<11-undoneSize;i++){
+                            report.getUndoneCountList().add("#N/A");
+                        }
+                    }
+
+                    List<String> undoneRatioList = Lists.newArrayList();
+                    for(String count : report.getUndoneCountList()){
+                        if(StringUtils.equals(count,"#N/A")){
+                            undoneRatioList.add("#N/A");
+                        }else{
+                            BigDecimal ratio = new BigDecimal(count).divide(new BigDecimal(orderCount),2, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100));
+                            undoneRatioList.add(ratio.toPlainString()+"%");
+                        }
+                    }
+                    report.setUndoneRatioList(undoneRatioList);
+
+                    reportList.add(report);
+                }
             }
 
             dataMap.put(StringUtils.join(new String[]{"statList",type.name()},""),reportList);
