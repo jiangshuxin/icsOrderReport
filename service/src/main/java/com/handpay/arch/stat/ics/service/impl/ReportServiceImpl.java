@@ -44,13 +44,13 @@ import net.sf.jxls.transformer.XLSTransformer;
 @Service
 public class ReportServiceImpl implements ReportService {
     private static Logger log = LoggerFactory.getLogger(ReportServiceImpl.class);
-    static final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+    private static final String datePattern = "yyyyMMdd";
+    static final SimpleDateFormat sdf = new SimpleDateFormat(datePattern);
 
 	@Autowired
 	private StatRepository statRepository;
     @Autowired
     private StringRedisTemplateX stringRedisTemplateX;
-    private String datePattern = "yyyyMMdd";
     private String outputPath = "/Users/sxjiang/";
     @Override
 	public List<Stat> embraceSumAndUndone(StatType statType) {
