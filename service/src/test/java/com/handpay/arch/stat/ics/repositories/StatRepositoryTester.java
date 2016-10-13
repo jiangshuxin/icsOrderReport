@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.handpay.arch.stat.ics.domain.MetaData.MixType;
+import com.handpay.arch.stat.ics.support.HalfMonthSupport;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -26,5 +27,11 @@ public class StatRepositoryTester {
 			statRepository.queryStat(type.getId(), "20161014");
 		}
 	}
+	
 
+	public static void main(String[] args) {
+		System.out.println(HalfMonthSupport.getDayRange("20160303"));
+		System.out.println(HalfMonthSupport.getDayRange("20160216"));
+		System.out.println(HalfMonthSupport.getDayRange("20160110"));
+	}
 }
