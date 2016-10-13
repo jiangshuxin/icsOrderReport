@@ -75,4 +75,11 @@ public class Stat {
 			return false;
 		return true;
 	}
+	
+	@Override
+	public String toString() {
+		return "Stat {queryDate=" + queryDate + ", statType=" + statType + ", orderDate=" + orderDate + ", orderCount=" + orderCount
+				+ ", undoneCount=" + undoneCount + "}";
+	}
+	
 }
