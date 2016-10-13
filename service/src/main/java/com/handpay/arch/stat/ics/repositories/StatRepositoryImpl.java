@@ -3,7 +3,11 @@ package com.handpay.arch.stat.ics.repositories;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -15,19 +19,29 @@ import com.handpay.arch.stat.ics.domain.SimpleOrderStat;
 @Repository
 public class StatRepositoryImpl implements StatRepository {
 	
+	private static Logger log = LoggerFactory.getLogger(StatRepositoryImpl.class);
 	static final BeanPropertyRowMapper<SimpleOrderStat> rowMapper = new BeanPropertyRowMapper<SimpleOrderStat>(SimpleOrderStat.class);
+//	static final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 	
 	@Autowired
 	private SqlGenerator sqlGenerator; 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	
+//	@Override
+//	public List<SimpleOrderStat> queryStat(int id) {
+//		System.out.println("------------------->>>" + sdf.format(new Date()));
+//		return queryStat(id, sdf.format(new Date()));
+//	}
+//	
+	@Cacheable(value="dataStats", cacheManager = "simpleCache", key="#dateStr + #id")
 	@Override
-	public List<SimpleOrderStat> queryStat(int id) {
+	public List<SimpleOrderStat> queryStat(int id, String dateStr) {
+		reload();
 		String sql = getSql(id);
 		List<SimpleOrderStat> statList = jdbcTemplate.query(sql, rowMapper);
-		System.out.println("sql::: " + sql);
-		System.out.println("statList::: " + statList);
+		log.info("dateStr:: " + dateStr + ",id:: "+id+",sql:: " + sql);
+		log.info("statList::: " + statList);
 		return statList;
 	}
 	
@@ -39,6 +53,10 @@ public class StatRepositoryImpl implements StatRepository {
 			}
 		}
 		throw new IllegalArgumentException("参数不正确---args::: " + id);
+	}
+	
+	@CacheEvict(value = "dataStats", allEntries = true) // 清空缓存
+	public void reload() {
 	}
 
 }

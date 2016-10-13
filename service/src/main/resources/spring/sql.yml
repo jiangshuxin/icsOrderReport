@@ -14,7 +14,7 @@ sql:
                     and ta.topupmerchant not in ('S363', 'S539', 'S797', 'S599', 'S629', 'S736', 'S976', 'S975', 'S972', 'S1005', 'S1045', 'S1037', 'S1043', 'S480', 'S508', 'S765', 'S876', 'S986', 'S1042', 'S765', 'S779', 'S873', 'S928', 'S876', 'S986', 'S700', 'S1042', 'S1023', 'S938', 'S1055', 'S1056', 'S918', 'S831')
                     and ta.ismanualtopup='1')
                     group by substr(importtime,0,8)
-                    order by substr(importtime,0,8) desc
+                    order by substr(importtime,0,8) asc
                   
     online-undone: select substr(importtime,0,8) orderDate, count(*) orderNum 
                    from (select distinct ts.merchorderid 商户订单号,td.id 拆分单ID,tb.status 批次状态,ts.status Source状态,td.status Detail状态,ml.merchanttransseq,ts.importtime,ml.ostatus,ml.pstatus,ml.dstatus from ics.topup_detai_source ts
@@ -32,7 +32,7 @@ sql:
                         and ta.ismanualtopup='1'
                         )
                       group by substr(importtime,0,8)
-                      order by substr(importtime,0,8) desc
+                      order by substr(importtime,0,8) asc
                       
     offline-sum: select substr(importtime,0,8) orderDate, count(*) orderNum 
                  from (select distinct ts.merchorderid 商户订单号,td.id 拆分单ID,tb.status 批次状态,ts.status Source状态,td.status Detail状态,ml.merchanttransseq,ts.importtime,ml.ostatus,ml.pstatus,ml.dstatus from ics.topup_detai_source ts
@@ -48,7 +48,7 @@ sql:
                     and ta.topupmerchant not in ('S363', 'S539', 'S797', 'S599', 'S629', 'S736', 'S976', 'S975', 'S972', 'S1005', 'S1045', 'S1037', 'S1043', 'S480', 'S508', 'S765', 'S876', 'S986', 'S1042', 'S765', 'S779', 'S873', 'S928', 'S876', 'S986', 'S700', 'S1042', 'S1023', 'S938', 'S1055', 'S1056', 'S918', 'S831')
                     and (ta.ismanualtopup<>'1'or ta.ismanualtopup is null))
                     group by substr(importtime,0,8)
-                    order by substr(importtime,0,8) desc
+                    order by substr(importtime,0,8) asc
                     
     offline-undone: select substr(importtime,0,8) orderDate, count(*) orederNum 
                     from (select distinct ts.merchorderid 商户订单号,td.id 拆分单ID,tb.status 批次状态,ts.status Source状态,td.status Detail状态,ml.merchanttransseq,ts.importtime,ml.ostatus,ml.pstatus,ml.dstatus from ics.topup_detai_source ts
@@ -66,7 +66,7 @@ sql:
                       and (ta.ismanualtopup<>'1'or ta.ismanualtopup is null)   
                       )
                       group by substr(importtime,0,8)
-                      order by substr(importtime,0,8) desc
+                      order by substr(importtime,0,8) asc
   
     sunshine-sum: select substr(importtime,0,8) orderDate, count(*) orderNum 
                   from (select distinct ts.merchorderid 商户订单号,td.id 拆分单ID,tb.status 批次状态,ts.status Source状态,td.status Detail状态,ml.merchanttransseq,ts.importtime,ml.ostatus,ml.pstatus,ml.dstatus from ics.topup_detai_source ts
@@ -81,7 +81,7 @@ sql:
                     and ta.topupmerchant like 'S804%'
                     and ta.topupmerchant not in ('S8040009','S8040005','S8040034'))
                     group by substr(importtime,0,8)
-                    order by substr(importtime,0,8) desc
+                    order by substr(importtime,0,8) asc
                     
     sunshine-undone: select substr(importtime,0,8) orderDate, count(*) orderNum 
                      from(select distinct ts.merchorderid 商户订单号,td.id 拆分单ID,tb.status 批次状态,ts.status Source状态,td.status Detail状态,ml.merchanttransseq,ts.importtime,ml.ostatus,ml.pstatus,ml.dstatus from ics.topup_detai_source ts
@@ -98,7 +98,7 @@ sql:
                         and (td.status ='10' or tb.status in ('02','20','NA'))
                         )
                         group by substr(importtime,0,8)
-                        order by substr(importtime,0,8) desc
+                        order by substr(importtime,0,8) asc
   
     mall-sum: select substr(m.ordertime,0,8) orderDate, count(*) orderNum
               from ics.mall_order m 
@@ -106,7 +106,7 @@ sql:
                 and m.ordertime <= to_char(sysdate-1,'yyyymmdd')||'235959'
                 and m.actcode in('ccc','spdbjd')
               group by substr(m.ordertime,0,8)
-              order by substr(m.ordertime,0,8) desc
+              order by substr(m.ordertime,0,8) asc
 
     mall-undone: select substr(m.ordertime,0,8) orderDate, count(*) orderNum
                   from ics.mall_order m 
@@ -115,4 +115,4 @@ sql:
                   and (m.pstatus<>'1' or m.dstatus='2')
                   and m.actcode in ('ccc','spdbjd')
                   group by substr(m.ordertime,0,8)
-                  order by substr(m.ordertime,0,8) desc
+                  order by substr(m.ordertime,0,8) asc

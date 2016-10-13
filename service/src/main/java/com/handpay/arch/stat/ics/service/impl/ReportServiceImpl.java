@@ -1,5 +1,29 @@
 package com.handpay.arch.stat.ics.service.impl;
 
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.collections.ListUtils;
+import org.apache.commons.collections.Transformer;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Service;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.handpay.arch.stat.ics.domain.MetaData;
@@ -11,31 +35,8 @@ import com.handpay.arch.stat.ics.domain.StatReport;
 import com.handpay.arch.stat.ics.repositories.StatRepository;
 import com.handpay.arch.stat.ics.service.ReportService;
 import com.handpay.rache.core.spring.StringRedisTemplateX;
-import net.sf.jxls.transformer.XLSTransformer;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.ListUtils;
-import org.apache.commons.collections.Transformer;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
-import org.apache.commons.lang3.time.DateUtils;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.stereotype.Service;
 
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.ParseException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import net.sf.jxls.transformer.XLSTransformer;
 
 /**
  * Created by sxjiang on 2016/10/12.
@@ -43,18 +44,19 @@ import java.util.Set;
 @Service
 public class ReportServiceImpl implements ReportService {
     private static Logger log = LoggerFactory.getLogger(ReportServiceImpl.class);
+    private static final String datePattern = "yyyyMMdd";
+    static final SimpleDateFormat sdf = new SimpleDateFormat(datePattern);
 
 	@Autowired
 	private StatRepository statRepository;
     @Autowired
     private StringRedisTemplateX stringRedisTemplateX;
-    private String datePattern = "yyyyMMdd";
     private String outputPath = "/Users/sxjiang/";
     @Override
 	public List<Stat> embraceSumAndUndone(StatType statType) {
     	//1. 查询订单总数和未完成订单数
-    	List<SimpleOrderStat> sumList = statRepository.queryStat(statType.getId());  
-    	List<SimpleOrderStat> undoneList = statRepository.queryStat(statType.getId() + CountType.Undone.getId());
+    	List<SimpleOrderStat> sumList = statRepository.queryStat(statType.getId(), sdf.format(new Date()));  
+    	List<SimpleOrderStat> undoneList = statRepository.queryStat(statType.getId() + CountType.Undone.getId(), sdf.format(new Date()));
     	
     	//2. 组装成Stat
     	Map<String, Stat> maps = Maps.newHashMap();
@@ -62,7 +64,7 @@ public class ReportServiceImpl implements ReportService {
     		Stat e = new Stat(statType.getId());
     		e.setOrderDate(sum.getOrderDate());
     		e.setOrderCount(sum.getOrderNum());
-            e.setQueryDate(DateFormatUtils.format(new Date(),datePattern));
+            e.setQueryDate(sdf.format(new Date()));
     		maps.put(e.getId(), e);
     	}
     	for(SimpleOrderStat undone: undoneList) {

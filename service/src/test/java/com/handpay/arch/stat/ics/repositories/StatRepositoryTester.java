@@ -17,7 +17,13 @@ public class StatRepositoryTester {
 	@Test
 	public void testQueryStat() {
 		for(MixType type: MixType.values()) {
-			statRepository.queryStat(type.getId());
+			statRepository.queryStat(type.getId(), "20161013");
+		}
+		for(MixType type: MixType.values()) {
+			statRepository.queryStat(type.getId(), "20161013");
+		}
+		for(MixType type: MixType.values()) {
+			statRepository.queryStat(type.getId(), "20161014");
 		}
 	}
 
