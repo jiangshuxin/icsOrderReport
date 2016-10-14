@@ -37,6 +37,7 @@ import com.handpay.arch.stat.ics.domain.Stat;
 import com.handpay.arch.stat.ics.domain.StatReport;
 import com.handpay.arch.stat.ics.repositories.StatRepository;
 import com.handpay.arch.stat.ics.service.ReportService;
+import com.handpay.arch.stat.ics.support.HalfMonthSupport;
 import com.handpay.rache.core.spring.StringRedisTemplateX;
 
 import net.sf.jxls.transformer.XLSTransformer;
@@ -58,14 +59,16 @@ public class ReportServiceImpl implements ReportService {
     @Override
 	public List<Stat> embraceSumAndUndone(StatType statType) {
     	//1. 查询订单总数和未完成订单数
-    	List<SimpleOrderStat> sumList = statRepository.queryStat(statType.getId(), sdf.format(new Date()));  
-    	List<SimpleOrderStat> undoneList = statRepository.queryStat(statType.getId() + CountType.Undone.getId(), sdf.format(new Date()));
+    	String range = HalfMonthSupport.getDayRange(sdf.format(new Date()));
+    	String queryDateStr = StatType.Mall.equals(statType) ? range : sdf.format(new Date());
+    	List<SimpleOrderStat> sumList = statRepository.queryStat(statType.getId(), queryDateStr);  
+    	List<SimpleOrderStat> undoneList = statRepository.queryStat(statType.getId() + CountType.Undone.getId(), queryDateStr);
     	
     	//2. 组装成Stat
     	Map<String, Stat> maps = Maps.newHashMap();
     	for(SimpleOrderStat sum: sumList) {
     		Stat e = new Stat(statType.getId());
-    		e.setOrderDate(sum.getOrderDate());
+    		e.setOrderDate(StatType.Mall.equals(statType) ? range : sum.getOrderDate());
     		e.setOrderCount(sum.getOrderNum());
             e.setQueryDate(sdf.format(new Date()));
     		maps.put(e.getId(), e);
@@ -76,8 +79,9 @@ public class ReportServiceImpl implements ReportService {
     			maps.get(key).setUndoneCount(undone.getOrderNum());
     		} else {
     			Stat e = new Stat(statType.getId());
-        		e.setOrderDate(undone.getOrderDate());
+        		e.setOrderDate(StatType.Mall.equals(statType) ? range : undone.getOrderDate());
         		e.setUndoneCount(undone.getOrderNum());
+        		e.setQueryDate(sdf.format(new Date()));
         		maps.put(e.getId(), e);
     		}
     	}

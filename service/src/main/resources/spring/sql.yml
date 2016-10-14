@@ -100,19 +100,17 @@ sql:
                         group by substr(importtime,0,8)
                         order by substr(importtime,0,8) desc
   
-    mall-sum: select substr(m.ordertime,0,8) orderDate, count(*) orderNum
-              from ics.mall_order m 
-              where m.ordertime >= to_char(sysdate-200,'yyyymmdd')||'000000'
-                and m.ordertime <= to_char(sysdate-1,'yyyymmdd')||'235959'
-                and m.actcode in('ccc','spdbjd')
-              group by substr(m.ordertime,0,8)
-              order by substr(m.ordertime,0,8) desc
-
-    mall-undone: select substr(m.ordertime,0,8) orderDate, count(*) orderNum
+    mall-sum: select ? orderDate, sum(orderOneNum) orderNum from (select substr(m.ordertime,0,8) orderOneDate, count(*) orderOneNum
                   from ics.mall_order m 
-                  where m.ordertime >= to_char(sysdate-200,'yyyymmdd')||'000000'
-                  and m.ordertime <= to_char(sysdate-1,'yyyymmdd')||'235959'
-                  and (m.pstatus<>'1' or m.dstatus='2')
-                  and m.actcode in ('ccc','spdbjd')
-                  group by substr(m.ordertime,0,8)
-                  order by substr(m.ordertime,0,8) desc
+                  where m.ordertime >= ?
+                    and m.ordertime <= ?
+                    and m.actcode in('ccc','spdbjd')
+                  group by substr(m.ordertime,0,8))
+
+    mall-undone: select ? orderDate, sum(orderOneNum) orderNum from (select substr(m.ordertime,0,8) orderOneDate, count(*) orderOneNum
+                  from ics.mall_order m 
+                  where m.ordertime >= ?
+                    and m.ordertime <= ?
+                    and (m.pstatus<>'1' or m.dstatus='2')
+                    and m.actcode in('ccc','spdbjd')
+                  group by substr(m.ordertime,0,8))

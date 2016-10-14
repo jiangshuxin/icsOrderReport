@@ -41,7 +41,7 @@ public class StatRepositoryImpl implements StatRepository {
 		reload();
 		String sql = getSql(id);
 		if (isMall(id)) {  //积分商城:参数为区间
-			return jdbcTemplate.query(sql, new Object[]{dateStr, dateStr.split("-")[0], dateStr.split("-")[1]}, rowMapper);
+			return jdbcTemplate.query(sql, new Object[]{dateStr, dateStr.split("-")[0]+"000000", dateStr.split("-")[1]+"235959"}, rowMapper);
 		}
 		List<SimpleOrderStat> statList = jdbcTemplate.query(sql, rowMapper);
 		log.info("dateStr:: " + dateStr + ",id:: "+id+",sql:: " + sql);
