@@ -21,6 +21,7 @@
 		<property name="locations">
 			<list>
  				<value>classpath*:rache.properties</value>
+				<value>classpath*:report.properties</value>
 			</list>
 		</property>
 	</bean>

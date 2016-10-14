@@ -8,7 +8,9 @@ public class Stat {
 	private int orderCount;
 	private int undoneCount;
 	private StatType statType;
-	
+
+	public Stat() {
+	}
 	public Stat(int ordinal) {
 		this.statType = StatType.values()[ordinal];
 	}
