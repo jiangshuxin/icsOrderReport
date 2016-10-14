@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.handpay.arch.stat.ics.domain.MetaData.MixType;
-import com.handpay.arch.stat.ics.support.HalfMonthSupport;
+import com.handpay.arch.stat.ics.support.AppSupport;
+import com.handpay.arch.stat.ics.support.MetaData.MixType;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -17,21 +17,33 @@ public class StatRepositoryTester {
 	
 	@Test
 	public void testQueryStat() {
-		for(MixType type: MixType.values()) {
-			statRepository.queryStat(type.getId(), "20161013");
+		for (MixType type : MixType.values()) {
+			if (AppSupport.isMall(type)) {
+				statRepository.queryStat(type.getId(), "20160413-20161013");
+			} else {
+				statRepository.queryStat(type.getId(), "20161013");
+			}
 		}
-		for(MixType type: MixType.values()) {
-			statRepository.queryStat(type.getId(), "20161013");
+		for (MixType type : MixType.values()) {
+			if (AppSupport.isMall(type)) {
+				statRepository.queryStat(type.getId(), "20160413-20161013");
+			} else {
+				statRepository.queryStat(type.getId(), "20161013");
+			}
 		}
-		for(MixType type: MixType.values()) {
-			statRepository.queryStat(type.getId(), "20161014");
+		for (MixType type : MixType.values()) {
+			if (AppSupport.isMall(type)) {
+				statRepository.queryStat(type.getId(), "20160414-20161014");
+			} else {
+				statRepository.queryStat(type.getId(), "20161014");
+			}
 		}
 	}
 	
 
 	public static void main(String[] args) {
-		System.out.println(HalfMonthSupport.getDayRange("20160303"));
-		System.out.println(HalfMonthSupport.getDayRange("20160216"));
-		System.out.println(HalfMonthSupport.getDayRange("20160110"));
+		System.out.println(AppSupport.buildRecentHalfMonthRange("20160303"));
+		System.out.println(AppSupport.buildRecentHalfMonthRange("20160216"));
+		System.out.println(AppSupport.buildRecentHalfMonthRange("20160110"));
 	}
 }

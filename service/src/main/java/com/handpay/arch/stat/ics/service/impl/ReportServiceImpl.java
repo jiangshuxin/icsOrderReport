@@ -6,14 +6,11 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.io.IOUtils;
@@ -27,17 +24,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.handpay.arch.stat.ics.domain.MetaData;
-import com.handpay.arch.stat.ics.domain.MetaData.CountType;
-import com.handpay.arch.stat.ics.domain.MetaData.StatType;
+import com.handpay.arch.stat.ics.domain.DateRange;
 import com.handpay.arch.stat.ics.domain.SimpleOrderStat;
 import com.handpay.arch.stat.ics.domain.Stat;
 import com.handpay.arch.stat.ics.domain.StatReport;
 import com.handpay.arch.stat.ics.repositories.StatRepository;
 import com.handpay.arch.stat.ics.service.ReportService;
-import com.handpay.arch.stat.ics.support.HalfMonthSupport;
+import com.handpay.arch.stat.ics.support.AppSupport;
+import com.handpay.arch.stat.ics.support.Constants;
+import com.handpay.arch.stat.ics.support.MetaData;
+import com.handpay.arch.stat.ics.support.MetaData.CountType;
+import com.handpay.arch.stat.ics.support.MetaData.StatType;
 import com.handpay.rache.core.spring.StringRedisTemplateX;
 
 import net.sf.jxls.transformer.XLSTransformer;
@@ -48,46 +49,52 @@ import net.sf.jxls.transformer.XLSTransformer;
 @Service
 public class ReportServiceImpl implements ReportService {
     private static Logger log = LoggerFactory.getLogger(ReportServiceImpl.class);
-    private static final String datePattern = "yyyyMMdd";
-    static final SimpleDateFormat sdf = new SimpleDateFormat(datePattern);
 
 	@Autowired
 	private StatRepository statRepository;
     @Autowired
     private StringRedisTemplateX stringRedisTemplateX;
     private String outputPath = "/Users/sxjiang/";
+    
+    @Override
+    public void makeReport(){
+    	for(MetaData.StatType type : MetaData.StatType.values()){
+			List<Stat> statList = embraceSumAndUndone(type);
+			makeSnapshot(statList.toArray(new Stat[0]));
+		}
+		DateRange range = AppSupport.buildSixMonthRange(AppSupport.TODAY);
+		exportExcel(range.getStartDate(), range.getEndDate());
+    }
+    
     @Override
 	public List<Stat> embraceSumAndUndone(StatType statType) {
+    	String range = AppSupport.buildRecentHalfMonthRange(AppSupport.TODAY).toString();
+    	String queryStr = StatType.Mall.equals(statType) ? range : AppSupport.TODAY;
+    	
     	//1. 查询订单总数和未完成订单数
-    	String range = HalfMonthSupport.getDayRange(sdf.format(new Date()));
-    	String queryDateStr = StatType.Mall.equals(statType) ? range : sdf.format(new Date());
-    	List<SimpleOrderStat> sumList = statRepository.queryStat(statType.getId(), queryDateStr);  
-    	List<SimpleOrderStat> undoneList = statRepository.queryStat(statType.getId() + CountType.Undone.getId(), queryDateStr);
+    	List<SimpleOrderStat> sumList = statRepository.queryStat(statType.getId(), queryStr);  
+    	List<SimpleOrderStat> undoneList = statRepository.queryStat(statType.getId() + CountType.Undone.getId(), queryStr);
     	
     	//2. 组装成Stat
     	Map<String, Stat> maps = Maps.newHashMap();
     	for(SimpleOrderStat sum: sumList) {
-    		Stat e = new Stat(statType.getId());
-    		e.setOrderDate(StatType.Mall.equals(statType) ? range : sum.getOrderDate());
+    		Stat e = new Stat(statType, sum, range);
     		e.setOrderCount(sum.getOrderNum());
-            e.setQueryDate(sdf.format(new Date()));
     		maps.put(e.getId(), e);
     	}
     	for(SimpleOrderStat undone: undoneList) {
-			String key = statType + "-" + undone.getOrderDate();
+			String key = statType + Constants.SEPERATOR + undone.getOrderDate();
     		if (maps.containsKey(key)) {
     			maps.get(key).setUndoneCount(undone.getOrderNum());
     		} else {
-    			Stat e = new Stat(statType.getId());
-        		e.setOrderDate(StatType.Mall.equals(statType) ? range : undone.getOrderDate());
-        		e.setUndoneCount(undone.getOrderNum());
-        		e.setQueryDate(sdf.format(new Date()));
+    			Stat e = new Stat(statType, undone, range);
+    			e.setUndoneCount(undone.getOrderNum());
         		maps.put(e.getId(), e);
     		}
     	}
 		return Lists.newArrayList(maps.values());
 	}
-
+    
     @Override
     public int makeSnapshot(Stat... stats) {//同一个查询时间
         for(Stat stat : stats){
@@ -95,9 +102,9 @@ public class ReportServiceImpl implements ReportService {
             if(type.equals(StatType.Mall)){
                 Date orderDay = null;
                 try {
-                    String[] period = stat.getOrderDate().split("-");
+                    String[] period = stat.getOrderDate().split(Constants.SEPERATOR);
                     if(period.length < 1)continue;
-                    orderDay = DateUtils.parseDate(period[0],datePattern);
+                    orderDay = DateUtils.parseDate(period[0], Constants.DATE_PATTERN);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -106,7 +113,7 @@ public class ReportServiceImpl implements ReportService {
             }else{
                 Date orderDay = null;
                 try {
-                    orderDay = DateUtils.parseDate(stat.getOrderDate(),datePattern);
+                    orderDay = DateUtils.parseDate(stat.getOrderDate(),Constants.DATE_PATTERN);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -126,7 +133,7 @@ public class ReportServiceImpl implements ReportService {
     private Double extractDateValue(String date){
         Date day = null;
         try {
-            day = DateUtils.parseDate(date,datePattern);
+            day = DateUtils.parseDate(date,Constants.DATE_PATTERN);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -145,7 +152,7 @@ public class ReportServiceImpl implements ReportService {
                 Set<String> objSet = stringRedisTemplateX.boundZSetOps(type.name()).reverseRangeByScore(fromValue,toValue);
                 for(String objStr : objSet){
                     Stat stat = JSON.parseObject(objStr,Stat.class);
-                    StatReport report = new StatReport(type.ordinal());
+                    StatReport report = new StatReport(type);
                     BeanUtils.copyProperties(stat,report);
                     report.setUndoneRatio(new BigDecimal(stat.getUndoneCount()).divide(new BigDecimal(stat.getOrderCount()),2,RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).toPlainString()+"%");
                     reportList.add(report);
@@ -153,13 +160,13 @@ public class ReportServiceImpl implements ReportService {
             }else{
                 Set<String> dateSet = stringRedisTemplateX.boundZSetOps(type.name()).reverseRangeByScore(fromValue,toValue);
                 for(String date : dateSet){
-                    StatReport report = new StatReport(type.ordinal());
+                    StatReport report = new StatReport(type);
                     report.setOrderDate(date);
 
-                    String orderCount = stringRedisTemplateX.boundValueOps(StringUtils.join(new String[]{type.name(),date,"orderCount"},"-")).get();
+                    String orderCount = stringRedisTemplateX.boundValueOps(StringUtils.join(new String[]{type.name(),date,"orderCount"},Constants.SEPERATOR)).get();
                     report.setOrderCount(Integer.parseInt(orderCount));
 
-                    List<Object> undoneCountList = stringRedisTemplateX.boundHashOps(StringUtils.join(new String[]{type.name(),date,"undoneCount"},"-")).values();
+                    List<Object> undoneCountList = stringRedisTemplateX.boundHashOps(StringUtils.join(new String[]{type.name(),date,"undoneCount"},Constants.SEPERATOR)).values();
                     report.setUndoneCountList(ListUtils.transformedList(undoneCountList, new Transformer() {
                         @Override
                         public String transform(Object input) {

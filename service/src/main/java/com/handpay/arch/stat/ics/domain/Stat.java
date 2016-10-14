@@ -1,6 +1,7 @@
 package com.handpay.arch.stat.ics.domain;
 
-import com.handpay.arch.stat.ics.domain.MetaData.StatType;
+import com.handpay.arch.stat.ics.support.AppSupport;
+import com.handpay.arch.stat.ics.support.MetaData.StatType;
 
 public class Stat {
 	private String queryDate;
@@ -9,12 +10,14 @@ public class Stat {
 	private int undoneCount;
 	private StatType statType;
 	
-	public Stat(int ordinal) {
-		this.statType = StatType.values()[ordinal];
+	public Stat() {}
+	public Stat(StatType statType) {
+		this.statType = statType;
 	}
-	public Stat(int ordinal, String orderDate) {	
-		this.statType = StatType.values()[ordinal];
-		this.orderDate = orderDate;
+	public Stat(StatType statType, SimpleOrderStat simple, String range) {
+		this(statType);
+		this.orderDate = StatType.Mall.equals(statType) ? range : simple.getOrderDate();
+		this.setQueryDate(AppSupport.TODAY);
 	}
 	
 	public String getId() {

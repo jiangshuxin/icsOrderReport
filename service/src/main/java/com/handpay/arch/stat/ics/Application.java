@@ -13,12 +13,15 @@ import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.Primary;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.handpay.arch.stat.ics.domain.MetaData;
 import com.handpay.arch.stat.ics.domain.Stat;
 import com.handpay.arch.stat.ics.service.ReportService;
+import com.handpay.arch.stat.ics.support.Constants;
+import com.handpay.arch.stat.ics.support.MetaData;
 import com.handpay.rache.core.spring.StringRedisTemplateX;
 
 /**
@@ -27,7 +30,8 @@ import com.handpay.rache.core.spring.StringRedisTemplateX;
 @RestController
 @SpringBootApplication
 @EnableCaching
-@ImportResource("spring/spring-application.xml")
+@EnableScheduling
+@ImportResource(Constants.REDIS_XML_LOCATION)
 public class Application {
 
 	@Autowired
@@ -36,12 +40,17 @@ public class Application {
 	private ReportService reportService;
 	
 	@Primary 
-	@Bean(name="simpleCache")
+	@Bean(name=Constants.CACHE_MAMAGER_NAME)
 	public CacheManager cacheManager() {
-		// configure and return an implementation of Spring's CacheManager SPI
 		SimpleCacheManager cacheManager = new SimpleCacheManager();
-		cacheManager.setCaches(Arrays.asList(new ConcurrentMapCache("dataStats")));
+		cacheManager.setCaches(Arrays.asList(new ConcurrentMapCache(Constants.CACHE_NAME)));
 		return cacheManager;
+	}
+	
+	@Scheduled(cron = "0 * * * * *")
+	public void doSomething() {
+		System.out.println("do something");
+		reportService.makeReport();
 	}
 	
 	@RequestMapping("/hello")

@@ -102,15 +102,15 @@ sql:
   
     mall-sum: select ? orderDate, sum(orderOneNum) orderNum from (select substr(m.ordertime,0,8) orderOneDate, count(*) orderOneNum
                   from ics.mall_order m 
-                  where m.ordertime >= ?
-                    and m.ordertime <= ?
+                  where m.ordertime >= ?||'000000'
+                    and m.ordertime <= ?||'235959'
                     and m.actcode in('ccc','spdbjd')
                   group by substr(m.ordertime,0,8))
 
     mall-undone: select ? orderDate, sum(orderOneNum) orderNum from (select substr(m.ordertime,0,8) orderOneDate, count(*) orderOneNum
                   from ics.mall_order m 
-                  where m.ordertime >= ?
-                    and m.ordertime <= ?
+                  where m.ordertime >= ?||'000000'
+                    and m.ordertime <= ?||'235959'
                     and (m.pstatus<>'1' or m.dstatus='2')
                     and m.actcode in('ccc','spdbjd')
                   group by substr(m.ordertime,0,8))

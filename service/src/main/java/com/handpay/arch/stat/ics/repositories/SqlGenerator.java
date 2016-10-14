@@ -3,7 +3,9 @@ package com.handpay.arch.stat.ics.repositories;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-@ConfigurationProperties(prefix = "sql.stat", locations = "classpath:spring/sql.yml")
+import com.handpay.arch.stat.ics.support.Constants;
+
+@ConfigurationProperties(prefix =Constants.SQL_PREFIX, locations = Constants.SQL_YML_LOCATION)
 @Component
 public class SqlGenerator {
 	private String onlineSum; // 在线批冲-订单总数
