@@ -88,12 +88,9 @@ public class ReportServiceImpl implements ReportService {
     	for(SimpleOrderStat undone: undoneList) {
 			String key = statType + Constants.SEPERATOR + undone.getOrderDate();
     		if (maps.containsKey(key)) {
-    			maps.get(key).setUndoneCount(undone.getOrderNum());
-    		} else {
-    			Stat e = new Stat(statType, undone, range);
-    			e.setUndoneCount(undone.getOrderNum());
-        		maps.put(e.getId(), e);
-    		}
+    			Stat e = maps.get(key);
+    			e.setUndoneCount(e.getOrderCount() - undone.getOrderNum());
+    		} 
     	}
 		return Lists.newArrayList(maps.values());
 	}
