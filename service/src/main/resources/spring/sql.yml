@@ -50,7 +50,7 @@ sql:
                     group by substr(importtime,0,8)
                     order by substr(importtime,0,8) desc
                     
-    offline-undone: select substr(importtime,0,8) orderDate, count(*) orederNum 
+    offline-undone: select substr(importtime,0,8) orderDate, count(*) orderNum 
                     from (select distinct ts.merchorderid 商户订单号,td.id 拆分单ID,tb.status 批次状态,ts.status Source状态,td.status Detail状态,ml.merchanttransseq,ts.importtime,ml.ostatus,ml.pstatus,ml.dstatus from ics.topup_detai_source ts
                       left join ics.topup_detail td on ts.id=td.refsourceid
                       left join ics.topup_batch tb on ts.refbatchid=tb.id
