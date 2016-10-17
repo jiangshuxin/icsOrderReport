@@ -3,7 +3,6 @@ package com.handpay.arch.stat.ics.repositories;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import org.assertj.core.util.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +13,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ReflectionUtils;
 
+import com.google.common.collect.Lists;
 import com.handpay.arch.stat.ics.domain.DateRange;
 import com.handpay.arch.stat.ics.domain.SimpleOrderStat;
 import com.handpay.arch.stat.ics.support.AppSupport;
