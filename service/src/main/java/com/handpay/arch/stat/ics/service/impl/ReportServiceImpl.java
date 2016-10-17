@@ -159,7 +159,11 @@ public class ReportServiceImpl implements ReportService {
                     Stat stat = JSON.parseObject(objStr,Stat.class);
                     StatReport report = new StatReport(type);
                     BeanUtils.copyProperties(stat,report);
-                    report.setUndoneRatio(new BigDecimal(stat.getUndoneCount()).divide(new BigDecimal(stat.getOrderCount()),2,RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).toPlainString()+"%");
+                    if(stat.getOrderCount() == 0){
+                        report.setUndoneRatio("0.0%");
+                    }else{
+                        report.setUndoneRatio(new BigDecimal(stat.getUndoneCount()).divide(new BigDecimal(stat.getOrderCount()),2,RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).toPlainString()+"%");
+                    }
                     reportList.add(report);
                 }
             }else{
