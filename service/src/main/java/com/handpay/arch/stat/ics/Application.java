@@ -57,6 +57,7 @@ public class Application {
 	}
 	
 	@Scheduled(cron = "0 0,30 * * * *")
+	@RequestMapping({"/report/start"})
 	public void doSomething() {
 		log.info("Job start ......");
 		reportService.makeReport();
