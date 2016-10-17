@@ -1,6 +1,7 @@
 package com.handpay.arch.stat.ics.domain;
 
 import com.handpay.arch.stat.ics.support.AppSupport;
+import com.handpay.arch.stat.ics.support.Constants;
 import com.handpay.arch.stat.ics.support.MetaData.StatType;
 
 public class Stat {
@@ -21,7 +22,7 @@ public class Stat {
 	}
 	
 	public String getId() {
-		return statType.toString() + "-" + orderDate;
+		return statType.toString() + Constants.SEPERATOR + orderDate;
 	}
 	public String getQueryDate() {
 		return queryDate;
