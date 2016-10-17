@@ -20,7 +20,8 @@
 	<bean id="propertyHolder" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" >
 		<property name="locations">
 			<list>
- 				<value>classpath*:rache.properties</value>
+ 				<value>classpath:rache.properties</value>
+ 				<value>classpath:report.properties</value>
 			</list>
 		</property>
 	</bean>
