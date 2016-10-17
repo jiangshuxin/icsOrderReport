@@ -15,6 +15,7 @@ import org.apache.commons.collections.ListUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
@@ -153,6 +154,8 @@ public class ReportServiceImpl implements ReportService {
             if(type.equals(StatType.Mall)){
                 Set<String> objSet = stringRedisTemplateX.boundZSetOps(type.name()).reverseRangeByScore(fromValue,toValue);
                 for(String objStr : objSet){
+					if (NumberUtils.isDigits(objStr))
+						continue;
                     Stat stat = JSON.parseObject(objStr,Stat.class);
                     StatReport report = new StatReport(type);
                     BeanUtils.copyProperties(stat,report);
