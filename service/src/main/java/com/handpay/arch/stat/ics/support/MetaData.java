@@ -1,4 +1,4 @@
-package com.handpay.arch.stat.ics.domain;
+package com.handpay.arch.stat.ics.support;
 
 public class MetaData {
 	public enum StatType {

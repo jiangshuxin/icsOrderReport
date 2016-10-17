@@ -2,17 +2,18 @@ package com.handpay.arch.stat.ics.domain;
 
 import java.util.List;
 
+import com.handpay.arch.stat.ics.support.MetaData.StatType;
+
 /**
  * Created by sxjiang on 2016/10/12.
  */
 public class StatReport extends Stat {
     private List<String> undoneCountList;
     private List<String> undoneRatioList;
-    //积分商城专用
     private String undoneRatio;
 
-    public StatReport(int ordinal) {
-        super(ordinal);
+    public StatReport(StatType type) {
+        super(type);
     }
 
     public List<String> getUndoneCountList() {
@@ -31,11 +32,12 @@ public class StatReport extends Stat {
         this.undoneRatioList = undoneRatioList;
     }
 
-    public String getUndoneRatio() {
-        return undoneRatio;
-    }
+	public String getUndoneRatio() {
+		return undoneRatio;
+	}
 
-    public void setUndoneRatio(String undoneRatio) {
-        this.undoneRatio = undoneRatio;
-    }
+	public void setUndoneRatio(String undoneRatio) {
+		this.undoneRatio = undoneRatio;
+	}
+    
 }
