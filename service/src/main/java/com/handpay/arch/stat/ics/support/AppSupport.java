@@ -72,7 +72,7 @@ public class AppSupport {
 	}
 	
 	private static String getMonthStr(int month) {
-		return month > 10 ? String.valueOf(month) : "0" + month;
+		return month > 9 ? String.valueOf(month) : "0" + month;
 	}
 	
 	/**
