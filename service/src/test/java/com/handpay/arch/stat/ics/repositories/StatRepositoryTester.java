@@ -45,5 +45,15 @@ public class StatRepositoryTester {
 		System.out.println(AppSupport.buildRecentHalfMonthRange("20160303"));
 		System.out.println(AppSupport.buildRecentHalfMonthRange("20160216"));
 		System.out.println(AppSupport.buildRecentHalfMonthRange("20160110"));
+		for(int i=0; i<100; i++) {
+			System.out.println("1-------->>"+AppSupport.getToday());
+//			System.out.println("2-------->>"+AppSupport.TODAY);
+			try {
+				Thread.sleep(10000L);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
 	}
 }

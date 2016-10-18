@@ -18,7 +18,7 @@ public class Stat {
 	public Stat(StatType statType, SimpleOrderStat simple, String range) {
 		this(statType);
 		this.orderDate = StatType.Mall.equals(statType) ? range : simple.getOrderDate();
-		this.setQueryDate(AppSupport.TODAY);
+		this.setQueryDate(AppSupport.getToday());
 	}
 	
 	public String getId() {

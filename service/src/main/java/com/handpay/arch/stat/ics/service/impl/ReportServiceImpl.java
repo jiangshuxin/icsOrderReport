@@ -65,14 +65,14 @@ public class ReportServiceImpl implements ReportService {
 			List<Stat> statList = embraceSumAndUndone(type);
 			makeSnapshot(statList.toArray(new Stat[0]));
 		}
-		DateRange range = AppSupport.buildSixMonthRange(AppSupport.TODAY);
+		DateRange range = AppSupport.buildSixMonthRange(AppSupport.getToday());
 		exportExcel(range.getStartDate(), range.getEndDate());
     }
     
     @Override
 	public List<Stat> embraceSumAndUndone(StatType statType) {
-    	String range = AppSupport.buildRecentHalfMonthRange(AppSupport.TODAY).toString();
-    	String queryStr = StatType.Mall.equals(statType) ? range : AppSupport.TODAY;
+    	String range = AppSupport.buildRecentHalfMonthRange(AppSupport.getToday()).toString();
+    	String queryStr = StatType.Mall.equals(statType) ? range : AppSupport.getToday();
     	
     	//1. 查询订单总数和未完成订单数
     	List<SimpleOrderStat> sumList = statRepository.queryStat(statType.getId(), queryStr);  
