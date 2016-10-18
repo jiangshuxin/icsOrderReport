@@ -160,7 +160,7 @@ public class ReportServiceImpl implements ReportService {
                     if(stat.getOrderCount() == 0){
                         report.setUndoneRatio("0.00%");
                     }else{
-                        report.setUndoneRatio(new BigDecimal(stat.getUndoneCount()).divide(new BigDecimal(stat.getOrderCount()),2,RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).toPlainString()+"%");
+                        report.setUndoneRatio(new BigDecimal(stat.getUndoneCount()).divide(new BigDecimal(stat.getOrderCount()),Constants.DEFAULT_SCALE,RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).toPlainString()+"%");
                     }
                     reportList.add(report);
                 }
@@ -204,7 +204,7 @@ public class ReportServiceImpl implements ReportService {
                         if(StringUtils.equals(count,"#N/A")){
                             undoneRatioList.add("#N/A");
                         }else{
-                            BigDecimal ratio = new BigDecimal(count).divide(new BigDecimal(orderCount),2, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100));
+                            BigDecimal ratio = new BigDecimal(count).divide(new BigDecimal(orderCount),Constants.DEFAULT_SCALE, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100));
                             undoneRatioList.add(ratio.toPlainString()+"%");
                         }
                     }

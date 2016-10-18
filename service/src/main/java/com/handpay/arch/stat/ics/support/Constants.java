@@ -11,5 +11,6 @@ public class Constants {
 	public static final String SQL_PREFIX = "sql.stat";
 	public static final String SQL_YML_LOCATION = "classpath:spring/sql.yml";
 	public static final String REDIS_XML_LOCATION = "classpath:spring/spring-application.xml";
-	
+
+	public static final int DEFAULT_SCALE = 2;
 }
