@@ -10,7 +10,11 @@ import com.handpay.arch.stat.ics.support.MetaData.MixType;
 public class AppSupport {
     public static final SimpleDateFormat SDF = new SimpleDateFormat(Constants.DATE_PATTERN);
     
-	public static String TODAY = SDF.format(new Date());
+//	public static String TODAY = SDF.format(new Date());
+	
+	public static String getToday() {
+		return SDF.format(new Date());
+	}
 	
 	public static boolean isMall(int id) {
 		return (MixType.MallSum.getId() == id) || (MixType.MallUndone.getId()  == id);
