@@ -109,7 +109,8 @@ public class ReportServiceImpl implements ReportService {
                     e.printStackTrace();
                 }
                 double value = Double.parseDouble(String.valueOf(orderDay.getTime()));
-                stringRedisTemplateX.boundZSetOps(type.name()).add(JSON.toJSONString(stat, SerializerFeature.WriteClassName),value);
+                Set<String> set = stringRedisTemplateX.boundZSetOps(type.name()).rangeByScore(value,value);
+                if(set.size() == 0) stringRedisTemplateX.boundZSetOps(type.name()).add(JSON.toJSONString(stat, SerializerFeature.WriteClassName),value);
             }else{
                 Date orderDay = null;
                 try {
@@ -157,7 +158,7 @@ public class ReportServiceImpl implements ReportService {
                     StatReport report = new StatReport(type);
                     BeanUtils.copyProperties(stat,report);
                     if(stat.getOrderCount() == 0){
-                        report.setUndoneRatio("0.0%");
+                        report.setUndoneRatio("0.00%");
                     }else{
                         report.setUndoneRatio(new BigDecimal(stat.getUndoneCount()).divide(new BigDecimal(stat.getOrderCount()),2,RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).toPlainString()+"%");
                     }
