@@ -56,7 +56,7 @@ public class Application {
 		return cacheManager;
 	}
 	
-	@Scheduled(cron = "0 0,30 * * * *")
+	@Scheduled(cron = "0 0 14 * * *")
 	@RequestMapping({"/report/start"})
 	public void doSomething() {
 		log.info("Job start ......");
