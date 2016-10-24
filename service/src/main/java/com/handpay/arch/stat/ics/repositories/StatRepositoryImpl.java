@@ -6,8 +6,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -17,7 +15,6 @@ import com.google.common.collect.Lists;
 import com.handpay.arch.stat.ics.domain.DateRange;
 import com.handpay.arch.stat.ics.domain.SimpleOrderStat;
 import com.handpay.arch.stat.ics.support.AppSupport;
-import com.handpay.arch.stat.ics.support.Constants;
 import com.handpay.arch.stat.ics.support.MetaData.MixType;
 
 @Repository
@@ -31,10 +28,10 @@ public class StatRepositoryImpl implements StatRepository {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	
-	@Cacheable(value = Constants.CACHE_NAME, key = Constants.CACHE_KEY_REGEX)
+//	@Cacheable(value = Constants.CACHE_NAME, key = Constants.CACHE_KEY_REGEX)
 	@Override
 	public List<SimpleOrderStat> queryStat(int id, String dateStr) {
-		reload();
+//		reload();
 
 		String sql = getSql(id);
 		List<SimpleOrderStat> statList = Lists.newArrayList();
@@ -60,8 +57,8 @@ public class StatRepositoryImpl implements StatRepository {
 		throw new IllegalArgumentException("参数不正确---args::: " + id);
 	}
 	
-	@CacheEvict(value=Constants.CACHE_NAME, allEntries = true) // 清空缓存
-	public void reload() {
-	}
+//	@CacheEvict(value=Constants.CACHE_NAME, allEntries = true) // 清空缓存
+//	public void reload() {
+//	}
 
 }
