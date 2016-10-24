@@ -183,19 +183,31 @@ public class ReportServiceImpl implements ReportService {
 
                     //特殊处理:Offline需展示到T+3  Online T+6 Sunshine T+10
                     int undoneSize = report.getUndoneCountList().size();
-                    if(type.equals(StatType.OfflineBatch) && undoneSize < 4){
-                        for(int i=0;i<4-undoneSize;i++){
-                            report.getUndoneCountList().add("#N/A");
+                    if(type.equals(StatType.OfflineBatch)){
+                        if(undoneSize < 4){
+                            for(int i=0;i<4-undoneSize;i++){
+                                report.getUndoneCountList().add("#N/A");
+                            }
+                        }else if(undoneSize > 4){
+                            report.setUndoneCountList(report.getUndoneCountList().subList(0,4));
                         }
                     }
-                    if(type.equals(StatType.OnlineBatch) && undoneSize < 7){
-                        for(int i=0;i<7-undoneSize;i++){
-                            report.getUndoneCountList().add("#N/A");
+                    if(type.equals(StatType.OnlineBatch)){
+                        if(undoneSize < 7){
+                            for(int i=0;i<7-undoneSize;i++){
+                                report.getUndoneCountList().add("#N/A");
+                            }
+                        }else if(undoneSize > 7){
+                            report.setUndoneCountList(report.getUndoneCountList().subList(0,7));
                         }
                     }
-                    if(type.equals(StatType.SunshineOnline) && undoneSize < 11){
-                        for(int i=0;i<11-undoneSize;i++){
-                            report.getUndoneCountList().add("#N/A");
+                    if(type.equals(StatType.SunshineOnline)){
+                        if(undoneSize < 11){
+                            for(int i=0;i<11-undoneSize;i++){
+                                report.getUndoneCountList().add("#N/A");
+                            }
+                        }else if(undoneSize > 11){
+                            report.setUndoneCountList(report.getUndoneCountList().subList(0,11));
                         }
                     }
 
