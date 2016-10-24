@@ -6,7 +6,7 @@ sql:
                     left join ics.topup_batch tb on ts.refbatchid=tb.id
                     left join ics.topup_activity ta on ts.refactivityid=ta.id
                     left join ics.merch_transaction_log ml on td.merchantorderid=ml.merchanttransseq
-                  where ts.importtime >= to_char(sysdate-200,'yyyymmdd')||'000000'
+                  where ts.importtime >= to_char(sysdate-16,'yyyymmdd')||'000000'
                     and ts.importtime <= to_char(sysdate-1,'yyyymmdd')||'235959'
                     and ta.id not in('10508','10885','17507') 
                     and ta.topupmerchant not like '%-%'
@@ -22,7 +22,7 @@ sql:
                        left join ics.topup_batch tb on ts.refbatchid=tb.id
                        left join ics.topup_activity ta on ts.refactivityid=ta.id
                        left join ics.merch_transaction_log ml on td.merchantorderid=ml.merchanttransseq
-                     where ts.importtime >= to_char(sysdate-200,'yyyymmdd')||'000000'
+                     where ts.importtime >= to_char(sysdate-16,'yyyymmdd')||'000000'
                         and ts.importtime <= to_char(sysdate-1,'yyyymmdd')||'235959'
                         and ta.id not in('10508','10885','17507') 
                         and ta.topupmerchant not like '%-%'
@@ -40,7 +40,7 @@ sql:
                     left join ics.topup_batch tb on ts.refbatchid=tb.id
                     left join ics.topup_activity ta on ts.refactivityid=ta.id
                     left join ics.merch_transaction_log ml on td.merchantorderid=ml.merchanttransseq
-                   where ts.importtime >= to_char(sysdate-200,'yyyymmdd')||'000000'
+                   where ts.importtime >= to_char(sysdate-16,'yyyymmdd')||'000000'
                     and ts.importtime <= to_char(sysdate-1,'yyyymmdd')||'235959'
                     and ta.id not in('10508','10885','17507') 
                     and ta.topupmerchant not like '%-%'
@@ -56,7 +56,7 @@ sql:
                       left join ics.topup_batch tb on ts.refbatchid=tb.id
                       left join ics.topup_activity ta on ts.refactivityid=ta.id
                       left join ics.merch_transaction_log ml on td.merchantorderid=ml.merchanttransseq
-                     where ts.importtime >= to_char(sysdate-200,'yyyymmdd')||'000000'
+                     where ts.importtime >= to_char(sysdate-16,'yyyymmdd')||'000000'
                       and ts.importtime <= to_char(sysdate-1,'yyyymmdd')||'235959'
                       and ta.id not in('10508','10885','17507') 
                       and ta.topupmerchant not like '%-%'
@@ -74,7 +74,7 @@ sql:
                     left join ics.topup_batch tb on ts.refbatchid=tb.id
                     left join ics.topup_activity ta on ts.refactivityid=ta.id
                     left join ics.merch_transaction_log ml on td.merchantorderid=ml.merchanttransseq
-                   where ts.importtime >= to_char(sysdate-200,'yyyymmdd')||'000000'
+                   where ts.importtime >= to_char(sysdate-16,'yyyymmdd')||'000000'
                     and ts.importtime <= to_char(sysdate-1,'yyyymmdd')||'235959'
                     and ta.id not in('10508','10885','17507') 
                     and ta.topupmerchant not like '%-%'
@@ -89,7 +89,7 @@ sql:
                         left join ics.topup_batch tb on ts.refbatchid=tb.id
                         left join ics.topup_activity ta on ts.refactivityid=ta.id
                         left join ics.merch_transaction_log ml on td.merchantorderid=ml.merchanttransseq
-                       where ts.importtime >= to_char(sysdate-200,'yyyymmdd')||'000000'
+                       where ts.importtime >= to_char(sysdate-16,'yyyymmdd')||'000000'
                         and ts.importtime <= to_char(sysdate-1,'yyyymmdd')||'235959'
                         and ta.id not in('10508','10885','17507') 
                         and ta.topupmerchant not like '%-%'
