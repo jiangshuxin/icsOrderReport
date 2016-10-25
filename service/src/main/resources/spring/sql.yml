@@ -12,7 +12,7 @@ sql:
                     and ta.topupmerchant not like '%-%'
                     and ta.topupmerchant not like 'S804%' 
                     and ta.topupmerchant not in ('S363', 'S539', 'S797', 'S599', 'S629', 'S736', 'S976', 'S975', 'S972', 'S1005', 'S1045', 'S1037', 'S1043', 'S480', 'S508', 'S765', 'S876', 'S986', 'S1042', 'S765', 'S779', 'S873', 'S928', 'S876', 'S986', 'S700', 'S1042', 'S1023', 'S938', 'S1055', 'S1056', 'S918', 'S831')
-                    and ta.ismanualtopup='1')
+                    and ta.topupmethod='01')
                     group by substr(importtime,0,8)
                     order by substr(importtime,0,8) desc
                   
@@ -29,7 +29,7 @@ sql:
                         and ta.topupmerchant not like 'S804%'
                         and ta.topupmerchant not in ('S363', 'S539', 'S797', 'S599', 'S629', 'S736', 'S976', 'S975', 'S972', 'S1005', 'S1045', 'S1037', 'S1043', 'S480', 'S508', 'S765', 'S876', 'S986', 'S1042', 'S765', 'S779', 'S873', 'S928', 'S876', 'S986', 'S700', 'S1042', 'S1023', 'S938', 'S1055', 'S1056', 'S918', 'S831')
                         and (td.status ='10' or tb.status in ('02','20','NA'))
-                        and ta.ismanualtopup='1'
+                        and ta.topupmethod='01'
                         )
                       group by substr(importtime,0,8)
                       order by substr(importtime,0,8) desc
@@ -46,7 +46,7 @@ sql:
                     and ta.topupmerchant not like '%-%'
                     and ta.topupmerchant not like 'S804%'
                     and ta.topupmerchant not in ('S363', 'S539', 'S797', 'S599', 'S629', 'S736', 'S976', 'S975', 'S972', 'S1005', 'S1045', 'S1037', 'S1043', 'S480', 'S508', 'S765', 'S876', 'S986', 'S1042', 'S765', 'S779', 'S873', 'S928', 'S876', 'S986', 'S700', 'S1042', 'S1023', 'S938', 'S1055', 'S1056', 'S918', 'S831')
-                    and (ta.ismanualtopup<>'1'or ta.ismanualtopup is null))
+                    and ta.topupmethod='00')
                     group by substr(importtime,0,8)
                     order by substr(importtime,0,8) desc
                     
@@ -63,7 +63,7 @@ sql:
                       and ta.topupmerchant not like 'S804%'
                       and ta.topupmerchant not in ('S363', 'S539', 'S797', 'S599', 'S629', 'S736', 'S976', 'S975', 'S972', 'S1005', 'S1045', 'S1037', 'S1043', 'S480', 'S508', 'S765', 'S876', 'S986', 'S1042', 'S765', 'S779', 'S873', 'S928', 'S876', 'S986', 'S700', 'S1042', 'S1023', 'S938', 'S1055', 'S1056', 'S918', 'S831')
                       and (td.status ='10' or tb.status in ('02','20','NA'))
-                      and (ta.ismanualtopup<>'1'or ta.ismanualtopup is null)   
+                      and ta.topupmethod='00'   
                       )
                       group by substr(importtime,0,8)
                       order by substr(importtime,0,8) desc
